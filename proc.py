@@ -10,7 +10,7 @@ def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""
     for h2 in soup.find_all("h2"):
         span = h2.find("span", {"class": "mw-headline"})
-        if span and span.text == "Full timeline":
+        if span and (span.text == "Full timeline" or span.text == "Timeline"):
             return h2
 
 def full_timeline_table(soup, h2):

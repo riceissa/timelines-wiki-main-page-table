@@ -47,6 +47,16 @@ def number_of_rows(pagename):
         return ""
 
 def print_table():
+    print("==Table of timelines==")
+    print("<!-- WARNING:")
+    print("Do not manually edit this table. This table is produced using")
+    print("an automated script. The script does not check for manual changes")
+    print("to the table, so any changes you make will be overwritten the next")
+    print("time the script runs. To make manual changes, the underlying CSV")
+    print("file must be edited. For more information, see the script")
+    print("repository at")
+    print("https://github.com/riceissa/timelines-wiki-main-page-table")
+    print("-->")
     print('{| class="sortable wikitable"')
     print("! Timeline subject !! Focus area !! Creation month "
           "!! Number of rows !! Monthly pageviews !! "

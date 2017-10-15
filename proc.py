@@ -67,6 +67,7 @@ def print_table():
             print('| style="text-align:right;" | ' + str(n))
             print('| style="text-align:right;" |')  # Monthly pageviews (Google Analytics)
             print('| style="text-align:right;" |')  # Monthly pageviews on Wikipedia
+        print("|}")
 
 if __name__ == "__main__":
     print_table()

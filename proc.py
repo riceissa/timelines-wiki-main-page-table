@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 import json
 import requests
+import csv
 
 
 def full_timeline_heading(soup):
@@ -28,7 +29,7 @@ def full_timeline_table(soup, h2):
 def number_of_rows(pagename):
     payload = {
         "action": "parse",
-        "page": "Timeline of Cato Institute",
+        "page": pagename,
         "format": "json",
     }
 
@@ -36,18 +37,36 @@ def number_of_rows(pagename):
     result = r.json()
     text = result["parse"]["text"]["*"]
     soup = BeautifulSoup(text, "lxml")
-    tables = soup.find_all("table")
-
-    # subtract one from number of rows to compensate for header row
-    print(list(map(lambda t: len(t.find_all("tr")) - 1, tables)))
-
-    # soup.find_all("h2")[1].find("span", {"class": "mw-headline"}).text
-    # soup.find_all("h2")[1].next_sibling.next_sibling.next_sibling.next_sibling
-
 
     h2 = full_timeline_heading(soup)
     full_timeline = full_timeline_table(soup, h2)
     if full_timeline:
-        print("Number of rows", len(full_timeline.find_all("tr")) - 1)
+        return len(full_timeline.find_all("tr")) - 1
     else:
-        print("Could not find full timeline.")
+        # Could not find full timeline
+        return ""
+
+def print_table():
+    print('{| class="sortable wikitable"')
+    print("! Timeline subject !! Focus area !! Creation month "
+          "!! Number of rows !! Monthly pageviews !! "
+          "Monthly pageviews on Wikipedia")
+    with open("pages.csv", newline='') as f:
+        reader = csv.DictReader(f)
+
+        for row in reader:
+            print("|-")
+            print("| [[" + row['page_name'] + "|" + row['page_display_name']
+                  + "]]")
+            print("| " + row['focus_area'])
+            if row['creation_month'] == 'Not yet complete':
+                print("| Not yet complete")
+            else:
+                print("| {{dts|" + row['creation_month'] + "}}")
+            n = number_of_rows(row['page_name'])
+            print('| style="text-align:right;" | ' + str(n))
+            print('| style="text-align:right;" |')  # Monthly pageviews (Google Analytics)
+            print('| style="text-align:right;" |')  # Monthly pageviews on Wikipedia
+
+if __name__ == "__main__":
+    print_table()

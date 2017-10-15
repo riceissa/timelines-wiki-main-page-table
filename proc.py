@@ -4,7 +4,34 @@ from bs4 import BeautifulSoup
 import json
 import requests
 import csv
+import datetime
+import urllib
 
+
+def pageviews(pagename, creation_month):
+    """
+    Get monthly pageviews data for pagename. creation_month is used to find out
+    what months to get the pageviews data for.
+    """
+    # Start getting pageviews data from the month following the creation of the
+    # page
+    cd = datetime.datetime.strptime(creation_month, "%B %Y")
+    if cd.month == 12:
+        start = str(cd.year + 1) + "0101"
+    else:
+        m = str(cd.month + 1) if cd.month + 1 >= 10 else "0" + str(cd.month + 1)
+        start = str(cd.year) + m + "01"
+    # Stop getting pageviews at the last day of the previous month
+    today = datetime.date.today()
+    last_day_of_last_month = datetime.date(today.year, today.month, 1) - \
+            datetime.timedelta(days=1)
+    end = datetime.datetime.strftime(last_day_of_last_month, "%Y%m%d")
+
+    url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/" + \
+          "per-article/en.wikipedia.org/all-access/user/" + \
+          urllib.parse.quote(pagename, safe="") + \
+          "/monthly/" + start + "/" + end
+    return url
 
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""

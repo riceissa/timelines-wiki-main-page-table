@@ -4,25 +4,6 @@ from bs4 import BeautifulSoup
 import json
 import requests
 
-url = "https://timelines.issarice.com/api.php?action=parse&page=Timeline_of_The_Sierra_Club"
-
-payload = {
-    "action": "parse",
-    "page": "Timeline of brain cancer",
-    "format": "json",
-}
-
-r = requests.get("https://timelines.issarice.com/api.php", params=payload)
-result = r.json()
-text = result["parse"]["text"]["*"]
-soup = BeautifulSoup(text, "lxml")
-tables = soup.find_all("table")
-
-# subtract one from number of rows to compensate for header row
-print(list(map(lambda t: len(t.find_all("tr")) - 1, tables)))
-
-# soup.find_all("h2")[1].find("span", {"class": "mw-headline"}).text
-# soup.find_all("h2")[1].next_sibling.next_sibling.next_sibling.next_sibling
 
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""
@@ -44,9 +25,29 @@ def full_timeline_table(soup, h2):
 
     # Otherwise, we stepped right through the page without finding the table
 
-h2 = full_timeline_heading(soup)
-full_timeline = full_timeline_table(soup, h2)
-if full_timeline:
-    print("Number of rows", len(full_timeline.find_all("tr")) - 1)
-else:
-    print("Could not find full timeline.")
+def number_of_rows(pagename):
+    payload = {
+        "action": "parse",
+        "page": "Timeline of Cato Institute",
+        "format": "json",
+    }
+
+    r = requests.get("https://timelines.issarice.com/api.php", params=payload)
+    result = r.json()
+    text = result["parse"]["text"]["*"]
+    soup = BeautifulSoup(text, "lxml")
+    tables = soup.find_all("table")
+
+    # subtract one from number of rows to compensate for header row
+    print(list(map(lambda t: len(t.find_all("tr")) - 1, tables)))
+
+    # soup.find_all("h2")[1].find("span", {"class": "mw-headline"}).text
+    # soup.find_all("h2")[1].next_sibling.next_sibling.next_sibling.next_sibling
+
+
+    h2 = full_timeline_heading(soup)
+    full_timeline = full_timeline_table(soup, h2)
+    if full_timeline:
+        print("Number of rows", len(full_timeline.find_all("tr")) - 1)
+    else:
+        print("Could not find full timeline.")

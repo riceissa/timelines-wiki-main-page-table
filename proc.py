@@ -13,6 +13,8 @@ def pageviews(pagename, creation_month):
     Get monthly pageviews data for pagename. creation_month is used to find out
     what months to get the pageviews data for.
     """
+    if creation_month in ["Not yet complete", ""]:
+        return 0
     today = datetime.date.today()
 
     # Start getting pageviews data from the month following the creation of the

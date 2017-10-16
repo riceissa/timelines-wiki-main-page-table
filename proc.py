@@ -44,7 +44,7 @@ def pageviews(pagename, creation_month):
     views = 0
     for month in result['items']:
         views += int(month['views'])
-    return views
+    return views / (last_day_of_last_month - start_date).days * 30
 
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""

@@ -128,7 +128,7 @@ def print_table():
             if wv_pageviews > 0:
                 print('| style="text-align:right;" |' + str(wv_pageviews))
             else:
-                print('| style="text-align:right;" | &ndash;')
+                print('| Not on Wikipedia')
         print("|}")
 
 if __name__ == "__main__":

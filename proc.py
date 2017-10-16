@@ -19,6 +19,19 @@ PAYMENTS = {x[0]: x[1] for x in cursor.fetchall()}
 cursor.close()
 cnx.close()
 
+GA_PAGEVIEWS = {}
+with open("ga.csv", newline='') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        GA_PAGEVIEWS[row['page_path']] = row['pageviews']
+
+def ga_pageviews(pagename):
+    """
+    Get Google Analytics pageviews for the last 30 days.
+    """
+    path = "/wiki/" + pagename.replace(" ", "_")
+    return int(GA_PAGEVIEWS.get(path, 0))
+
 def payment(pagename):
     return round(PAYMENTS.get(pagename, 0.0), 2)
 
@@ -140,7 +153,7 @@ def print_table():
             n = number_of_rows(row['page_name'])
             print('| style="text-align:right;" | ' + str(n))
             print('| style="text-align:right;" | ' + str(payment(row['page_name'])))
-            print('| style="text-align:right;" |')  # Monthly pageviews (Google Analytics)
+            print('| style="text-align:right;" | ' + str(ga_pageviews(row['page_name'])))
             wv_pageviews = int(pageviews(row['page_name'], row['creation_month']))
             if wv_pageviews > 0:
                 print('| style="text-align:right;" |' + str(wv_pageviews))

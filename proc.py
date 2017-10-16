@@ -42,6 +42,8 @@ def pageviews(pagename, creation_month):
     r = requests.get(url)
     result = r.json()
     views = 0
+    if 'items' not in result:
+        return 0
     for month in result['items']:
         views += int(month['views'])
     return views / (last_day_of_last_month - start_date).days * 30

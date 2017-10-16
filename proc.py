@@ -63,7 +63,8 @@ def full_timeline_table(soup, h2):
     "Full timeline" heading tag.
     """
     tag = h2
-    while tag and tag.name != "table":
+    while tag and (tag.name != "table" or
+            "not-full-timeline" in tag.get("class")):
         tag = tag.next_sibling
     if tag:
         return tag

@@ -1,0 +1,96 @@
+#!/usr/bin/env python3
+
+# Modified from
+# https://developers.google.com/analytics/devguides/reporting/core/v4/quickstart/service-py
+"""Hello Analytics Reporting API V4."""
+
+import datetime
+
+from apiclient.discovery import build
+from oauth2client.service_account import ServiceAccountCredentials
+
+
+SCOPES = ['https://www.googleapis.com/auth/analytics.readonly']
+KEY_FILE_LOCATION = 'client_secrets.json'
+with open("view_id.txt", "r") as f:
+    VIEW_ID = next(f).strip()
+
+
+def quote(x):
+    """CSV-quote x."""
+    x = x.replace('"', '""')
+    return '"' + x + '"'
+
+
+def initialize_analyticsreporting():
+    """Initializes an Analytics Reporting API V4 service object.
+
+    Returns:
+      An authorized Analytics Reporting API V4 service object.
+    """
+    credentials = ServiceAccountCredentials.from_json_keyfile_name(
+        KEY_FILE_LOCATION, SCOPES)
+
+    # Build the service object.
+    analytics = build('analyticsreporting', 'v4', credentials=credentials)
+
+    return analytics
+
+
+def get_report(analytics):
+    """Queries the Analytics Reporting API V4.
+
+    Args:
+      analytics: An authorized Analytics Reporting API V4 service object.
+    Returns:
+      The Analytics Reporting API V4 response.
+    """
+    return analytics.reports().batchGet(
+        body={
+          'reportRequests': [
+          {
+            'viewId': VIEW_ID,
+            'dateRanges': [{'startDate': '30daysAgo', 'endDate': 'today'}],
+            'metrics': [{'expression': 'ga:pageviews'}],
+            'dimensions': [{'name': 'ga:pagePath'}]
+          }]
+        }
+    ).execute()
+
+
+def print_response(response):
+    """Parses and prints the Analytics Reporting API V4 response.
+
+    Args:
+      response: An Analytics Reporting API V4 response.
+    """
+    print("page_path,date_range,pageviews")
+    for report in response.get('reports', []):
+        columnHeader = report.get('columnHeader', {})
+        dimensionHeaders = columnHeader.get('dimensions', [])
+        metricHeaders = columnHeader.get('metricHeader', {}).get('metricHeaderEntries', [])
+
+        for row in report.get('data', {}).get('rows', []):
+            dimensions = row.get('dimensions', [])
+            dateRangeValues = row.get('metrics', [])
+
+            for header, dimension in zip(dimensionHeaders, dimensions):
+                # print(header + ': ' + dimension)
+                print(quote(dimension), end=',')
+
+            for i, values in enumerate(dateRangeValues):
+                # print('Date range: ' + str(i))
+                print(str(i), end=',')
+                for metricHeader, value in zip(metricHeaders, values.get('values')):
+                    # print(metricHeader.get('name') + ': ' + value)
+                    print(value)
+
+
+def main():
+    analytics = initialize_analyticsreporting()
+    response = get_report(analytics)
+    # print(response)
+    print_response(response)
+
+if __name__ == '__main__':
+    main()

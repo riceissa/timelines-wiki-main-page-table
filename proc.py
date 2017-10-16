@@ -150,11 +150,23 @@ def print_table():
                 print("| {{dts|" + row['creation_month'] + "}}")
             n = number_of_rows(row['page_name'])
             print('| style="text-align:right;" | ' + str(n))
-            print('| style="text-align:right;" | ' + str(payment(row['page_name'])))
+            p = payment(row['page_name'])
+            if p > 0:
+                print('| style="text-align:right;" | [{} {:.2f}]'.format(
+                    "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
+                            .format(urllib.parse.quote_plus(row['page_name'])),
+                    p
+                ))
+            else:
+                print('| style="text-align:right;" | 0.00')
             print('| style="text-align:right;" | ' + str(ga_pageviews(row['page_name'])))
             wv_pageviews = int(pageviews(row['page_name'], row['creation_month']))
             if wv_pageviews > 0:
-                print('| style="text-align:right;" |' + str(wv_pageviews))
+                print('| style="text-align:right;" | [{} {}]'.format(
+                    "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
+                            .format(urllib.parse.quote_plus(row['page_name'])),
+                    str(wv_pageviews)
+                    ))
             else:
                 print('| Not on Wikipedia')
         print("|}")

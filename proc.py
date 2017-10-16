@@ -102,9 +102,13 @@ def print_table():
     print("https://github.com/riceissa/timelines-wiki-main-page-table")
     print("-->")
     print('{| class="sortable wikitable"')
-    print("! Timeline subject !! Focus area !! Creation month "
-          "!! Number of rows !! Monthly pageviews !! "
-          "Monthly pageviews on Wikipedia")
+    print("|-")
+    print("! Timeline subject")
+    print("! Focus area")
+    print("! Creation month")
+    print('! data-sort-type="number" | Number of rows')
+    print('! data-sort-type="number" | Monthly pageviews')
+    print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
     with open("pages.csv", newline='') as f:
         reader = csv.DictReader(f)
 

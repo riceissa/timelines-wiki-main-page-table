@@ -31,7 +31,13 @@ def pageviews(pagename, creation_month):
           "per-article/en.wikipedia.org/all-access/user/" + \
           urllib.parse.quote(pagename, safe="") + \
           "/monthly/" + start + "/" + end
-    return url
+
+    r = requests.get(url)
+    result = r.json()
+    views = 0
+    for month in result['items']:
+        views += int(month['views'])
+    return views
 
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""

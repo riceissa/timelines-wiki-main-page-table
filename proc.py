@@ -119,7 +119,7 @@ def print_table():
             print('| style="text-align:right;" | ' + str(n))
             print('| style="text-align:right;" |')  # Monthly pageviews (Google Analytics)
             wv_pageviews = pageviews(row['page_name'], row['creation_month'])
-            if wv_pageviews > 0
+            if wv_pageviews > 0:
                 print('| style="text-align:right;" |' + str(wv_pageviews))
             else:
                 print('| style="text-align:right;" | &ndash;')

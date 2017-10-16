@@ -13,16 +13,23 @@ def pageviews(pagename, creation_month):
     Get monthly pageviews data for pagename. creation_month is used to find out
     what months to get the pageviews data for.
     """
+    today = datetime.date.today()
+
     # Start getting pageviews data from the month following the creation of the
-    # page
+    # page or 12 months ago, whichever comes later. We want to average over at
+    # most twelve months of pageviews data.
     cd = datetime.datetime.strptime(creation_month, "%B %Y")
     if cd.month == 12:
-        start = str(cd.year + 1) + "0101"
+        start_date = datetime.date(cd.year + 1, 1, 1)
     else:
-        m = str(cd.month + 1) if cd.month + 1 >= 10 else "0" + str(cd.month + 1)
-        start = str(cd.year) + m + "01"
+        start_date = datetime.date(cd.year, cd.month + 1, 1)
+    max_back = datetime.date(today.year - 1, today.month, 1)
+    start_date = max(start_date, max_back)
+    m = str(start_date.month) if start_date.month >= 10 else "0" + \
+            str(start_date.month)
+    start = str(start_date.year) + m + "01"
+
     # Stop getting pageviews at the last day of the previous month
-    today = datetime.date.today()
     last_day_of_last_month = datetime.date(today.year, today.month, 1) - \
             datetime.timedelta(days=1)
     end = datetime.datetime.strftime(last_day_of_last_month, "%Y%m%d")

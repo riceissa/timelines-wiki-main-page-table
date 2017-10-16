@@ -6,7 +6,21 @@ import requests
 import csv
 import datetime
 import urllib
+import mysql.connector
 
+
+cnx = mysql.connector.connect(user='issa', database='contractwork')
+cursor = cnx.cursor()
+cursor.execute("""select task_receptacle,sum(payment)
+               from tasks group by task_receptacle""")
+
+PAYMENTS = {x[0]: x[1] for x in cursor.fetchall()}
+
+cursor.close()
+cnx.close()
+
+def payment(pagename):
+    return round(PAYMENTS.get(pagename, 0.0), 2)
 
 def pageviews(pagename, creation_month):
     """
@@ -108,6 +122,7 @@ def print_table():
     print("! Focus area")
     print("! Creation month")
     print('! data-sort-type="number" | Number of rows')
+    print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
     with open("pages.csv", newline='') as f:
@@ -124,6 +139,7 @@ def print_table():
                 print("| {{dts|" + row['creation_month'] + "}}")
             n = number_of_rows(row['page_name'])
             print('| style="text-align:right;" | ' + str(n))
+            print('| style="text-align:right;" | ' + str(payment(row['page_name'])))
             print('| style="text-align:right;" |')  # Monthly pageviews (Google Analytics)
             wv_pageviews = int(pageviews(row['page_name'], row['creation_month']))
             if wv_pageviews > 0:

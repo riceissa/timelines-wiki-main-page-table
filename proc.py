@@ -119,7 +119,6 @@ def number_of_rows(pagename):
         return ""
 
 def print_table():
-    print("==Table of timelines==")
     print("<!-- WARNING:")
     print("Do not manually edit this table. This table is produced using")
     print("an automated script. The script does not check for manual changes")

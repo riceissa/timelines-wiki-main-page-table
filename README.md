@@ -18,3 +18,8 @@ Steps:
   ```
 
 - `make table.mediawiki`: Re-run `proc.py`. The wikipedia pageviews fetching is included in this.
+
+- update https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with
+  the contents of `table.mediawiki`
+
+- update the last generated date on https://timelines.issarice.com/wiki/Main_Page

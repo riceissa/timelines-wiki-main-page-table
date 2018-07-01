@@ -10,6 +10,8 @@ import urllib
 import mysql.connector
 import time
 
+logging.basicConfig(level=logging.INFO)
+
 
 # By checking the contractwork database, we can tell most of the time whether a
 # timeline is complete or not by looking at the total payment (if it's zero,
@@ -128,7 +130,7 @@ def query(request, sleep=1):
         # Call API
         r = requests.get("https://timelines.issarice.com/api.php", params=req)
         result = r.json()
-        logging.info("ON ITERATION %s, SLEEPING FOR %s", iteration, sleep)
+        logging.info("QUERY: ON ITERATION %s, SLEEPING FOR %s", iteration, sleep)
         time.sleep(sleep)
         iteration += 1
         if 'error' in result:
@@ -198,6 +200,7 @@ def wp_pageviews(pagename):
           urllib.parse.quote(pagename, safe="") + \
           "/monthly/" + start + "/" + end
 
+    logging.info("Querying Wikipedia pageviews for %s", pagename)
     r = requests.get(url)
     result = r.json()
     views = 0
@@ -238,6 +241,7 @@ def number_of_rows(pagename):
         "format": "json",
     }
 
+    logging.info("Querying number of rows for %s", pagename)
     r = requests.get("https://timelines.issarice.com/api.php", params=payload)
     result = r.json()
     text = result["parse"]["text"]["*"]

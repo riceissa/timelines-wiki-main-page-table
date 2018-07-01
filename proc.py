@@ -5,6 +5,7 @@ import json
 import requests
 import csv
 import datetime
+import logging
 import urllib
 import mysql.connector
 import time
@@ -16,7 +17,7 @@ cursor.execute("""select task_receptacle,sum(payment),min(topic),min(completion_
                from tasks group by task_receptacle""")
 
 ARTICLES = {x[0]: {"payment": x[1], "topic": x[2],
-                   "creation_month": datetime.datetime.strptime(x[3], "%Y-%m-%d").strftime("%B %Y")}
+                   "creation_month": x[3].strftime("%B %Y")}
             for x in cursor.fetchall()}
 
 cursor.close()
@@ -39,6 +40,17 @@ def payment(pagename):
     return round(ARTICLES.get(pagename, {"payment": 0.0})["payment"], 2)
 
 
+def topic(pagename):
+    if pagename in ARTICLES:
+        return ARTICLES[pagename]["topic"]
+    return ""
+
+
+def creation_month(pagename):
+    if pagename in ARTICLES:
+        return ARTICLES[pagename]["creation_month"]
+    return ""
+
 # Modified from https://www.mediawiki.org/wiki/API:Query#Continuing_queries
 def query(request, sleep=1):
     request['action'] = 'query'
@@ -52,8 +64,7 @@ def query(request, sleep=1):
         # last result.
         req.update(lastContinue)
         # Call API
-        r = requests.get("https://timelines.issarice.com/api.php", params=req,
-                         headers=HEADERS)
+        r = requests.get("https://timelines.issarice.com/api.php", params=req)
         result = r.json()
         logging.info("ON ITERATION %s, SLEEPING FOR %s", iteration, sleep)
         time.sleep(sleep)
@@ -88,19 +99,20 @@ def page_display_name(pagename):
     return pagename
 
 
-def pageviews(pagename, creation_month):
+def pageviews(pagename):
     """
     Get monthly pageviews data for pagename. creation_month is used to find out
     what months to get the pageviews data for.
     """
-    if creation_month in ["Not yet complete", ""]:
+    cm = creation_month(pagename)
+    if cm in ["Not yet complete", ""]:
         return 0
     today = datetime.date.today()
 
     # Start getting pageviews data from the month following the creation of the
     # page or 12 months ago, whichever comes later. We want to average over at
     # most twelve months of pageviews data.
-    cd = datetime.datetime.strptime(creation_month, "%B %Y")
+    cd = datetime.datetime.strptime(cm, "%B %Y")
     if cd.month == 12:
         start_date = datetime.date(cd.year + 1, 1, 1)
     else:
@@ -194,11 +206,11 @@ def print_table():
         print("|-")
         print("| [[" + pagename + "|" + page_display_name(pagename)
               + "]]")
-        print("| " + ARTICLES[pagename]["topic"])
-        if not ARTICLES[pagename]["creation_month"]:
+        print("| " + topic(pagename))
+        if not creation_month(pagename):
             print("| Not yet complete")
         else:
-            print("| {{dts|" + ARTICLES[pagename]["creation_month"] + "}}")
+            print("| {{dts|" + creation_month(pagename) + "}}")
         n = number_of_rows(pagename)
         print('| style="text-align:right;" | ' + str(n))
         p = payment(pagename)
@@ -211,7 +223,7 @@ def print_table():
         else:
             print('| style="text-align:right;" | 0.00')
         print('| style="text-align:right;" | ' + str(ga_pageviews(pagename)))
-        wv_pageviews = int(pageviews(pagename, ARTICLES[pagename]["creation_month"]))
+        wv_pageviews = int(pageviews(pagename))
         if wv_pageviews > 0:
             print('| style="text-align:right;" | [{} {}]'.format(
                 "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \

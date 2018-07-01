@@ -11,6 +11,76 @@ import mysql.connector
 import time
 
 
+# By checking the contractwork database, we can tell most of the time whether a
+# timeline is complete or not by looking at the total payment (if it's zero,
+# it's incomplete; otherwise it's complete). The exceptions are timelines that
+# are "non-paid", meaning someone made it outside of contract work and it won't
+# ever receive payment. Since the contractwork database doesn't track these
+# timelines, we have to list them out here.
+NONPAID_COMPLETE_ARTICLES = {
+        "Timeline of Bay Area Rapid Transit":
+            {"topic": "Transportation", "creation_month": "May 2017"},
+        "Timeline of Carl Shulman publications":
+            {"topic": "Rationality", "creation_month": "June 2017"},
+        "Timeline of Chinese immigration to the United States":
+            {"topic": "Migration", "creation_month": "May 2017"},
+        "Timeline of DOS operating systems":
+            {"topic": "Miscellaneous technology", "creation_month": "October 2008"},
+        "Timeline of Google Search":
+            {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
+        "Timeline of H-1B":
+            {"topic": "Migration", "creation_month": "August 2017"},
+        }
+        "Timeline of HTTPS adoption":
+            {"topic": "Miscellaneous technology", "creation_month": "November 2017"},
+        }
+        "Timeline of immigrant processing and visa policy in Canada":
+            {"topic": "Migration", "creation_month": "November 2017"},
+        }
+        "Timeline of immigrant processing and visa policy in the United Kingdom":
+            {"topic": "Migration", "creation_month": "November 2017"},
+        }
+        "Timeline of immigrant processing and visa policy in the United States":
+            {"topic": "Migration", "creation_month": "March 2017"},
+        }
+        "Timeline of immigration detention in the United States":
+            {"topic": "Migration", "creation_month": "November 2017"},
+        }
+        "Timeline of immigration enforcement in the United Kingdom":
+            {"topic": "Migration", "creation_month": "November 2017"},
+        }
+        "Timeline of immigration enforcement in the United States":
+            {"topic": "Migration", "creation_month": "March 2017"},
+        }
+        "Timeline of IPv6 adoption":
+            {"topic": "Miscellaneous technology", "creation_month": "November 2017"},
+        }
+        "Timeline of machine translation":
+            {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
+        }
+        "Timeline of online dating services":
+            {"topic": "Miscellaneous technology", "creation_month": "June 2015"},
+        }
+        "Timeline of online job search and professional networking":
+            {"topic": "Miscellaneous technology", "creation_month": "May 2017"},
+        }
+        "Timeline of site search":
+            {"topic": "Miscellaneous technology", "creation_month": "May 2017"},
+        }
+        "Timeline of student visa policy in the United States":
+            {"topic": "Migration", "creation_month": "November 2017"},
+        }
+        "Timeline of TempleOS":
+            {"topic": "Miscellaneous technology", "creation_month": "March 2017"},
+        }
+        "Timeline of Wei Dai publications":
+            {"topic": "Rationality", "creation_month": "February 2018"},
+        }
+        "Timeline of web search engines":
+            {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
+        }
+
+
 cnx = mysql.connector.connect(user='issa', database='contractwork')
 cursor = cnx.cursor()
 cursor.execute("""select task_receptacle,sum(payment),min(topic),min(completion_date)

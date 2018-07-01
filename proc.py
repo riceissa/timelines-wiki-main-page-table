@@ -300,7 +300,7 @@ def print_table():
         print("|-")
         print("| [[" + pagename + "|" + page_display_name(pagename)
               + "]]")
-        print("| " + topic(pagename) if topic(pagename) else "")
+        print("| " + topic(pagename) if topic(pagename) else "|")
         if not creation_month(pagename):
             print("| Not yet complete")
         else:

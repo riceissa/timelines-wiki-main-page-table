@@ -254,13 +254,14 @@ def number_of_rows(pagename):
 
 def print_table():
     print("<!-- WARNING:")
-    print("Do not manually edit this table. This table is produced using")
-    print("an automated script. The script does not check for manual changes")
-    print("to the table, so any changes you make will be overwritten the next")
-    print("time the script runs. To make manual changes, the underlying CSV")
-    print("file must be edited. For more information, see the script")
-    print("repository at")
-    print("https://github.com/riceissa/timelines-wiki-main-page-table")
+    print("Do not manually edit this table. This table is produced using\n"
+          "an automated script. The script does not check for manual changes\n"
+          "to the table, so any changes you make will be overwritten the next\n"
+          "time the script runs. The script automatically finds all pages on\n"
+          "the wiki starting with \"Timeline of\" so any timeline you write will\n"
+          "automatically be included in the table the next time the script\n"
+          "runs. For more information, see the script repository at\n"
+          "https://github.com/riceissa/timelines-wiki-main-page-table")
     print('-->{| class="sortable wikitable"')
     print("|-")
     print("! Timeline subject")

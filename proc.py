@@ -17,7 +17,7 @@ import time
 # are "non-paid", meaning someone made it outside of contract work and it won't
 # ever receive payment. Since the contractwork database doesn't track these
 # timelines, we have to list them out here.
-NONPAID_COMPLETE_ARTICLES = {
+ARTICLES = {
         "Timeline of Bay Area Rapid Transit":
             {"topic": "Transportation", "creation_month": "May 2017"},
         "Timeline of Carl Shulman publications":
@@ -30,52 +30,36 @@ NONPAID_COMPLETE_ARTICLES = {
             {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
         "Timeline of H-1B":
             {"topic": "Migration", "creation_month": "August 2017"},
-        }
         "Timeline of HTTPS adoption":
             {"topic": "Miscellaneous technology", "creation_month": "November 2017"},
-        }
         "Timeline of immigrant processing and visa policy in Canada":
             {"topic": "Migration", "creation_month": "November 2017"},
-        }
         "Timeline of immigrant processing and visa policy in the United Kingdom":
             {"topic": "Migration", "creation_month": "November 2017"},
-        }
         "Timeline of immigrant processing and visa policy in the United States":
             {"topic": "Migration", "creation_month": "March 2017"},
-        }
         "Timeline of immigration detention in the United States":
             {"topic": "Migration", "creation_month": "November 2017"},
-        }
         "Timeline of immigration enforcement in the United Kingdom":
             {"topic": "Migration", "creation_month": "November 2017"},
-        }
         "Timeline of immigration enforcement in the United States":
             {"topic": "Migration", "creation_month": "March 2017"},
-        }
         "Timeline of IPv6 adoption":
             {"topic": "Miscellaneous technology", "creation_month": "November 2017"},
-        }
         "Timeline of machine translation":
             {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
-        }
         "Timeline of online dating services":
             {"topic": "Miscellaneous technology", "creation_month": "June 2015"},
-        }
         "Timeline of online job search and professional networking":
             {"topic": "Miscellaneous technology", "creation_month": "May 2017"},
-        }
         "Timeline of site search":
             {"topic": "Miscellaneous technology", "creation_month": "May 2017"},
-        }
         "Timeline of student visa policy in the United States":
             {"topic": "Migration", "creation_month": "November 2017"},
-        }
         "Timeline of TempleOS":
             {"topic": "Miscellaneous technology", "creation_month": "March 2017"},
-        }
         "Timeline of Wei Dai publications":
             {"topic": "Rationality", "creation_month": "February 2018"},
-        }
         "Timeline of web search engines":
             {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
         }
@@ -86,9 +70,9 @@ cursor = cnx.cursor()
 cursor.execute("""select task_receptacle,sum(payment),min(topic),min(completion_date)
                from tasks group by task_receptacle""")
 
-ARTICLES = {x[0]: {"payment": x[1], "topic": x[2],
-                   "creation_month": x[3].strftime("%B %Y")}
-            for x in cursor.fetchall()}
+ARTICLES.update({x[0]: {"payment": x[1], "topic": x[2],
+                        "creation_month": x[3].strftime("%B %Y")}
+                 for x in cursor.fetchall()})
 
 cursor.close()
 cnx.close()

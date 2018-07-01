@@ -96,6 +96,12 @@ def ga_pageviews(pagename):
 
 def dictionary_ordering(x):
     """Sorting key as a string would be ordered in an English dictionary."""
+    # Strip out the "the" from the beginning of page names
+    for prefix in ["timeline of the ", "timeline of "]:
+        if x.lower().startswith(prefix):
+            x = x[len(prefix):]
+            break
+
     return "".join(char for char in x.lower() if char.isalpha())
 
 
@@ -171,9 +177,9 @@ def pagename_generator():
 
 
 def page_display_name(pagename):
-    prefix = "timeline of "
-    if pagename.lower().startswith(prefix):
-        return pagename[len(prefix)].upper() + pagename[len(prefix)+1:]
+    for prefix in ["timeline of the ", "timeline of "]:
+        if pagename.lower().startswith(prefix):
+            return pagename[len(prefix)].upper() + pagename[len(prefix)+1:]
     return pagename
 
 
@@ -294,7 +300,7 @@ def print_table():
         print("|-")
         print("| [[" + pagename + "|" + page_display_name(pagename)
               + "]]")
-        print("| " + topic(pagename))
+        print("| " + topic(pagename) if topic(pagename) else "")
         if not creation_month(pagename):
             print("| Not yet complete")
         else:

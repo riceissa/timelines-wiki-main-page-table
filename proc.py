@@ -12,10 +12,12 @@ import time
 
 cnx = mysql.connector.connect(user='issa', database='contractwork')
 cursor = cnx.cursor()
-cursor.execute("""select task_receptacle,sum(payment)
+cursor.execute("""select task_receptacle,sum(payment),min(topic),min(completion_date)
                from tasks group by task_receptacle""")
 
-PAYMENTS = {x[0]: x[1] for x in cursor.fetchall()}
+ARTICLES = {x[0]: {"payment": x[1], "topic": x[2],
+                   "creation_month": datetime.datetime.strptime(x[3], "%Y-%m-%d").strftime("%B %Y")}
+            for x in cursor.fetchall()}
 
 cursor.close()
 cnx.close()
@@ -34,7 +36,7 @@ def ga_pageviews(pagename):
     return int(GA_PAGEVIEWS.get(path, 0))
 
 def payment(pagename):
-    return round(PAYMENTS.get(pagename, 0.0), 2)
+    return round(ARTICLES.get(pagename, {"payment": 0.0})["payment"], 2)
 
 
 # Modified from https://www.mediawiki.org/wiki/API:Query#Continuing_queries
@@ -194,28 +196,28 @@ def print_table():
             print("|-")
             print("| [[" + pagename + "|" + page_display_name(pagename)
                   + "]]")
-            print("| " + row['focus_area'])
-            if row['creation_month'] == 'Not yet complete':
+            print("| " + ARTICLES[pagename]["topic"])
+            if not ARTICLES[pagename]["creation_month"]:
                 print("| Not yet complete")
             else:
-                print("| {{dts|" + row['creation_month'] + "}}")
-            n = number_of_rows(row['page_name'])
+                print("| {{dts|" + ARTICLES[pagename]["creation_month"] + "}}")
+            n = number_of_rows(pagename)
             print('| style="text-align:right;" | ' + str(n))
-            p = payment(row['page_name'])
+            p = payment(pagename)
             if p > 0:
                 print('| style="text-align:right;" | [{} {:.2f}]'.format(
                     "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
-                            .format(urllib.parse.quote_plus(row['page_name'])),
+                            .format(urllib.parse.quote_plus(pagename)),
                     p
                 ))
             else:
                 print('| style="text-align:right;" | 0.00')
-            print('| style="text-align:right;" | ' + str(ga_pageviews(row['page_name'])))
-            wv_pageviews = int(pageviews(row['page_name'], row['creation_month']))
+            print('| style="text-align:right;" | ' + str(ga_pageviews(pagename)))
+            wv_pageviews = int(pageviews(pagename, ARTICLES[pagename]["creation_month"]))
             if wv_pageviews > 0:
                 print('| style="text-align:right;" | [{} {}]'.format(
                     "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
-                            .format(urllib.parse.quote_plus(row['page_name'])),
+                            .format(urllib.parse.quote_plus(pagename)),
                     str(wv_pageviews)
                     ))
             else:

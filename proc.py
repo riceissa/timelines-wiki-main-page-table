@@ -98,7 +98,7 @@ def dictionary_ordering(x):
 
 
 def payment(pagename):
-    return round(ARTICLES.get(pagename, {"payment": 0.0})["payment"], 2)
+    return round(ARTICLES.get(pagename, {"payment": 0.0}).get("payment", 0.0), 2)
 
 
 def topic(pagename):
@@ -161,13 +161,16 @@ def page_display_name(pagename):
     return pagename
 
 
-def pageviews(pagename):
+def wp_pageviews(pagename):
     """
-    Get monthly pageviews data for pagename. creation_month is used to find out
-    what months to get the pageviews data for.
+    Get monthly Wikipedia pageviews data for pagename.
     """
+    # creation_month is used to find out what months to get the pageviews data
+    # for
     cm = creation_month(pagename)
-    if cm in ["Not yet complete", ""]:
+    # If the page isn't done, it won't be on Wikipedia so don't bother getting
+    # pageviews
+    if not cm:
         return 0
     today = datetime.date.today()
 
@@ -289,12 +292,12 @@ def print_table():
         else:
             print('| style="text-align:right;" | 0.00')
         print('| style="text-align:right;" | ' + str(ga_pageviews(pagename)))
-        wv_pageviews = int(pageviews(pagename))
-        if wv_pageviews > 0:
+        wp_pv = int(wp_pageviews(pagename))
+        if wp_pv > 0:
             print('| style="text-align:right;" | [{} {}]'.format(
                 "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
                         .format(urllib.parse.quote_plus(pagename)),
-                str(wv_pageviews)
+                str(wp_pv)
                 ))
         else:
             print('| Not on Wikipedia')

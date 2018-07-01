@@ -5,11 +5,9 @@ This is the script that prints the table seen at
 
 Steps:
 
-- (manual) add any new timelines created or completed since the last time the
-  script was run.
 - `make clean`
 - `make ga.csv`: Re-run google analytics script to get a new `ga.csv`
-- (manual) git pull from vipul's contract work repo, then re-read the `tasks.sql` file,
+- (manual) git pull from Vipul's contract work repo, then re-read the `tasks.sql` file,
   to get new payments info
 
   ```bash
@@ -19,7 +17,7 @@ Steps:
   mysql contractwork < sql/tasks.sql
   ```
 
-- `make table.mediawiki`: Re-run `proc.py`. The wikipedia pageviews fetching is included in this.
+- `make table.mediawiki`: Re-run `proc.py`. The Wikipedia pageviews fetching is included in this.
 
 - (manual) update https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with
   the contents of `table.mediawiki`

@@ -189,40 +189,38 @@ def print_table():
     print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
-    with open("pages.csv", newline='') as f:
-        reader = csv.DictReader(f)
 
-        for pagename in pagename_generator():
-            print("|-")
-            print("| [[" + pagename + "|" + page_display_name(pagename)
-                  + "]]")
-            print("| " + ARTICLES[pagename]["topic"])
-            if not ARTICLES[pagename]["creation_month"]:
-                print("| Not yet complete")
-            else:
-                print("| {{dts|" + ARTICLES[pagename]["creation_month"] + "}}")
-            n = number_of_rows(pagename)
-            print('| style="text-align:right;" | ' + str(n))
-            p = payment(pagename)
-            if p > 0:
-                print('| style="text-align:right;" | [{} {:.2f}]'.format(
-                    "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
-                            .format(urllib.parse.quote_plus(pagename)),
-                    p
+    for pagename in pagename_generator():
+        print("|-")
+        print("| [[" + pagename + "|" + page_display_name(pagename)
+              + "]]")
+        print("| " + ARTICLES[pagename]["topic"])
+        if not ARTICLES[pagename]["creation_month"]:
+            print("| Not yet complete")
+        else:
+            print("| {{dts|" + ARTICLES[pagename]["creation_month"] + "}}")
+        n = number_of_rows(pagename)
+        print('| style="text-align:right;" | ' + str(n))
+        p = payment(pagename)
+        if p > 0:
+            print('| style="text-align:right;" | [{} {:.2f}]'.format(
+                "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
+                        .format(urllib.parse.quote_plus(pagename)),
+                p
+            ))
+        else:
+            print('| style="text-align:right;" | 0.00')
+        print('| style="text-align:right;" | ' + str(ga_pageviews(pagename)))
+        wv_pageviews = int(pageviews(pagename, ARTICLES[pagename]["creation_month"]))
+        if wv_pageviews > 0:
+            print('| style="text-align:right;" | [{} {}]'.format(
+                "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
+                        .format(urllib.parse.quote_plus(pagename)),
+                str(wv_pageviews)
                 ))
-            else:
-                print('| style="text-align:right;" | 0.00')
-            print('| style="text-align:right;" | ' + str(ga_pageviews(pagename)))
-            wv_pageviews = int(pageviews(pagename, ARTICLES[pagename]["creation_month"]))
-            if wv_pageviews > 0:
-                print('| style="text-align:right;" | [{} {}]'.format(
-                    "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
-                            .format(urllib.parse.quote_plus(pagename)),
-                    str(wv_pageviews)
-                    ))
-            else:
-                print('| Not on Wikipedia')
-        print("|}")
+        else:
+            print('| Not on Wikipedia')
+    print("|}")
 
 if __name__ == "__main__":
     print_table()

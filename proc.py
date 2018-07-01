@@ -36,6 +36,11 @@ def ga_pageviews(pagename):
     path = "/wiki/" + pagename.replace(" ", "_")
     return int(GA_PAGEVIEWS.get(path, 0))
 
+
+def dictionary_ordering(x):
+    """Sorting key as a string would be ordered in an English dictionary."""
+    return "".join(char for char in x.lower() if char.isalpha())
+
 def payment(pagename):
     return round(ARTICLES.get(pagename, {"payment": 0.0})["payment"], 2)
 
@@ -202,7 +207,7 @@ def print_table():
     print('! data-sort-type="number" | Monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
 
-    for pagename in pagename_generator():
+    for pagename in sorted(pagename_generator(), key=dictionary_ordering):
         print("|-")
         print("| [[" + pagename + "|" + page_display_name(pagename)
               + "]]")

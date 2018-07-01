@@ -7,6 +7,7 @@ import csv
 import datetime
 import urllib
 import mysql.connector
+import time
 
 
 cnx = mysql.connector.connect(user='issa', database='contractwork')
@@ -34,6 +35,56 @@ def ga_pageviews(pagename):
 
 def payment(pagename):
     return round(PAYMENTS.get(pagename, 0.0), 2)
+
+
+# Modified from https://www.mediawiki.org/wiki/API:Query#Continuing_queries
+def query(request, sleep=1):
+    request['action'] = 'query'
+    request['format'] = 'json'
+    lastContinue = {'continue': ''}
+    iteration = 0
+    while True:
+        # Clone original request
+        req = request.copy()
+        # Modify it with the values returned in the 'continue' section of the
+        # last result.
+        req.update(lastContinue)
+        # Call API
+        r = requests.get("https://timelines.issarice.com/api.php", params=req,
+                         headers=HEADERS)
+        result = r.json()
+        logging.info("ON ITERATION %s, SLEEPING FOR %s", iteration, sleep)
+        time.sleep(sleep)
+        iteration += 1
+        if 'error' in result:
+            raise ValueError(r.url, result['error'])
+        if 'warnings' in result:
+            logging.warning(result['warnings'])
+        if 'query' in result:
+            yield result['query']
+        if 'continue' not in result:
+            break
+        lastContinue = result['continue']
+
+
+def pagename_generator():
+    payload = {
+            "list": "allpages",
+            "apprefix": "Timeline of",
+            "apfilterredir": "nonredirects",
+            "aplimit": 50,
+            }
+    for result in query(payload):
+        for page in result["allpages"]:
+            yield page["title"]
+
+
+def page_display_name(pagename):
+    prefix = "timeline of "
+    if pagename.lower().startswith(prefix):
+        return pagename[len(prefix)].upper() + pagename[len(prefix)+1:]
+    return pagename
+
 
 def pageviews(pagename, creation_month):
     """
@@ -139,9 +190,9 @@ def print_table():
     with open("pages.csv", newline='') as f:
         reader = csv.DictReader(f)
 
-        for row in reader:
+        for pagename in pagename_generator():
             print("|-")
-            print("| [[" + row['page_name'] + "|" + row['page_display_name']
+            print("| [[" + pagename + "|" + page_display_name(pagename)
                   + "]]")
             print("| " + row['focus_area'])
             if row['creation_month'] == 'Not yet complete':

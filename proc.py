@@ -110,6 +110,20 @@ def topic(pagename):
 
 
 def creation_month(pagename):
+    # These are timelines where the initial work took place without payment,
+    # but then paid work took place for updates. In these cases, the first
+    # payment date is misleading so we override them.
+    overrides = {
+            "Timeline of Airbnb": "August 2014",
+            "Timeline of Facebook": "July 2010",
+            "Timeline of GitHub": "July 2016",
+            "Timeline of Pinterest": "August 2014",
+            "Timeline of Snapchat": "September 2014",
+            "Timeline of Twitter": "January 2014",
+            }
+    if pagename in overrides:
+        return overrides[pagename]
+
     if pagename in ARTICLES:
         return ARTICLES[pagename]["creation_month"]
     return ""

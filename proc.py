@@ -29,6 +29,7 @@ with open("ga.csv", newline='') as f:
     for row in reader:
         GA_PAGEVIEWS[row['page_path']] = row['pageviews']
 
+
 def ga_pageviews(pagename):
     """
     Get Google Analytics pageviews for the last 30 days.
@@ -40,6 +41,7 @@ def ga_pageviews(pagename):
 def dictionary_ordering(x):
     """Sorting key as a string would be ordered in an English dictionary."""
     return "".join(char for char in x.lower() if char.isalpha())
+
 
 def payment(pagename):
     return round(ARTICLES.get(pagename, {"payment": 0.0})["payment"], 2)
@@ -55,6 +57,7 @@ def creation_month(pagename):
     if pagename in ARTICLES:
         return ARTICLES[pagename]["creation_month"]
     return ""
+
 
 # Modified from https://www.mediawiki.org/wiki/API:Query#Continuing_queries
 def query(request, sleep=1):
@@ -147,12 +150,14 @@ def pageviews(pagename):
         views += int(month['views'])
     return views / (last_day_of_last_month - start_date).days * 30
 
+
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""
     for h2 in soup.find_all("h2"):
         span = h2.find("span", {"class": "mw-headline"})
         if span and (span.text == "Full timeline" or span.text == "Timeline"):
             return h2
+
 
 def full_timeline_table(soup, h2):
     """
@@ -167,6 +172,7 @@ def full_timeline_table(soup, h2):
         return tag
 
     # Otherwise, we stepped right through the page without finding the table
+
 
 def number_of_rows(pagename):
     payload = {
@@ -187,6 +193,7 @@ def number_of_rows(pagename):
     else:
         # Could not find full timeline
         return ""
+
 
 def print_table():
     print("<!-- WARNING:")
@@ -238,6 +245,7 @@ def print_table():
         else:
             print('| Not on Wikipedia')
     print("|}")
+
 
 if __name__ == "__main__":
     print_table()

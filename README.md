@@ -23,3 +23,7 @@ Steps:
   the contents of `table.mediawiki`
 
 - (manual) update the last generated date on https://timelines.issarice.com/wiki/Main_Page
+
+## See also
+
+- https://github.com/riceissa/analytics-table

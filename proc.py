@@ -28,6 +28,8 @@ ARTICLES = {
             {"topic": "Migration", "creation_month": "May 2017"},
         "Timeline of DOS operating systems":
             {"topic": "Miscellaneous technology", "creation_month": "October 2008"},
+        "Timeline of genetic engineering in humans":
+            {"topic": "Miscellaneous technology", "creation_month": "December 2018"},
         "Timeline of Google Search":
             {"topic": "Miscellaneous technology", "creation_month": "February 2014"},
         "Timeline of H-1B":

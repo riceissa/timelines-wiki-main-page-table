@@ -79,6 +79,14 @@ ARTICLES.update({x[0]: {"payment": x[1], "topic": x[2],
                         "creation_month": x[3].strftime("%B %Y")}
                  for x in cursor.fetchall()})
 
+PRINCIPAL_CONTRIBUTORS = {}
+cursor.execute("""select task_receptacle, worker, sum(payment) from tasks
+                  group by task_receptacle, worker""")
+for task_receptacle, worker, total_payment in cursor.fetchall():
+    if task_receptacle not in PRINCIPAL_CONTRIBUTORS:
+        PRINCIPAL_CONTRIBUTORS[task_receptacle] = []
+    PRINCIPAL_CONTRIBUTORS[task_receptacle].append((worker, total_payment))
+
 cursor.close()
 cnx.close()
 
@@ -317,6 +325,7 @@ def print_table():
     print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Principal contributors')
 
     for pagename in sorted(pagename_generator(), key=dictionary_ordering):
         print("|-")
@@ -349,6 +358,14 @@ def print_table():
                 ))
         else:
             print('| Not on Wikipedia')
+        try:
+            contributors = list(sorted(PRINCIPAL_CONTRIBUTORS[pagename],
+                                       key=lambda x: x[1],
+                                       reverse=True))
+            print('| ' + ", ".join('<span title="%s">%s</span>' % ("$" + str(payment), worker)
+                                   for worker, payment in contributors))
+        except KeyError:
+            print('|')
     print("|}")
 
 

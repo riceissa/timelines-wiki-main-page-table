@@ -5,6 +5,7 @@ import json
 import requests
 import csv
 import datetime
+import dateutil.parser
 import logging
 import urllib
 import mysql.connector
@@ -255,6 +256,24 @@ def full_timeline_table(soup, h2):
 
     # Otherwise, we stepped right through the page without finding the table
 
+def last_modified_month(pagename):
+    """Find the most recent month in which the page was modified, according to
+    the last edit date on the page (so even minor typo fixes can bump the
+    date)."""
+    payload = {
+            "action": "query",
+            "prop": "revisions",
+            "titles": pagename,
+            "rvprop": "timestamp",
+            "rvlimit": 1,
+            "rvdir": "older",  # confusingly, "older" gets the most recent revisions first
+            "format": "json",
+            }
+    logging.info("Querying last modified month for %s", pagename)
+    r = requests.get("https://timelines.issarice.com/api.php", params=payload)
+    result = r.json()
+    return dateutil.parser.parse(list(result['query']['pages'].values())[0]['revisions'][0]['timestamp']).strftime("%B %Y")
+
 
 def number_of_rows(pagename):
     payload = {
@@ -293,6 +312,7 @@ def print_table():
     print("! Timeline subject")
     print("! Focus area")
     print("! Creation month")
+    print("! Last modification month")
     print('! data-sort-type="number" | Number of rows')
     print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
@@ -307,6 +327,7 @@ def print_table():
             print("| Not yet complete")
         else:
             print("| {{dts|" + creation_month(pagename) + "}}")
+        print("| {{dts|" + last_modified_month(pagename) + "}}")
         n = number_of_rows(pagename)
         print('| style="text-align:right;" | ' + str(n))
         p = payment(pagename)

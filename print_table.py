@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-import pdb
-
 import csv
 import sqlite3
 import urllib.parse
@@ -66,10 +64,11 @@ def print_table(reader):
 
 
 def print_summary_tables(reader):
-    # Create a sqlite db in memory; from https://stackoverflow.com/a/2888042/3422337
-    cnx = sqlite3.connect(":memory:")
-    cursor = cnx.cursor()
-    cursor.execute("create table t (" + ", ".join(util.fieldnames) + ");")
+    conn = sqlite3.connect('timelines.db')
+    cursor = conn.cursor()
+    with open('schema.sql', 'r') as f:
+        cursor.executescript(f.read())
+
     rows = []
     for row in reader:
         rows.append(tuple(row[field] for field in util.fieldnames))
@@ -97,7 +96,13 @@ def print_summary_tables(reader):
         print('| ' + principal_contributors)
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
-        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+        # For some reason, the row number total changes from an integer to a
+        # float for the blank principal contributor, even when the field is
+        # explicitly set to integer in the schema. See
+        # https://timelines.issarice.com/index.php?title=User:Issa/test&oldid=35031
+        # for how that looks. I can't figure out why this happens, so just
+        # force it to an int before printing.
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
     print("|}")
 
 
@@ -122,7 +127,7 @@ def print_summary_tables(reader):
         print('| ' + topic)
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
-        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
     print("|}")
 
 
@@ -147,12 +152,12 @@ def print_summary_tables(reader):
         print('| ' + str(exists_on_wikipedia))
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
-        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
     print("|}")
 
 
-    cnx.commit()
-    cnx.close()
+    conn.commit()
+    conn.close()
 
 
 if __name__ == "__main__":

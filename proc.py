@@ -188,13 +188,6 @@ def pagename_generator():
             yield page["title"]
 
 
-def page_display_name(pagename):
-    for prefix in ["timeline of the ", "timeline of "]:
-        if pagename.lower().startswith(prefix):
-            return pagename[len(prefix)].upper() + pagename[len(prefix)+1:]
-    return pagename
-
-
 def wp_pageviews(pagename):
     """
     Get monthly Wikipedia pageviews data for pagename.

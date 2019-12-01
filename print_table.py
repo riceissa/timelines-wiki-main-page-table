@@ -2,6 +2,8 @@
 
 import csv
 
+import util
+
 def print_table(reader):
     print("<!-- WARNING:")
     print("Do not manually edit this table. This table is produced using\n"
@@ -27,7 +29,7 @@ def print_table(reader):
     # for pagename in sorted(pagename_generator(), key=dictionary_ordering):
     for row in reader:
         print("|-")
-        print("| [[" + row['pagename'] + "|" + page_display_name(row['pagename'])
+        print("| [[" + row['pagename'] + "|" + util.page_display_name(row['pagename'])
               + "]]")
         print("| " + row['topic'] if row['topic'] else "|")
         if not row['creation_month']:

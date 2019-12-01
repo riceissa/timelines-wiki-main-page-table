@@ -161,9 +161,9 @@ def print_summary_tables(reader):
 
 
 if __name__ == "__main__":
-    # with open('front_page_table_data.csv', newline='') as csvfile:
-    #     reader = csv.DictReader(csvfile)
-    #     print_table(reader)
+    with open('front_page_table_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        print_table(reader)
 
     # The main table can just use the CSV as given, but for the summary tables,
     # we want to import into sqlite so we can group things. So re-read the CSV

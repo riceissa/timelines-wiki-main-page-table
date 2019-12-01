@@ -12,6 +12,8 @@ import urllib
 import mysql.connector
 import time
 
+import util
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -299,12 +301,7 @@ def number_of_rows(pagename):
         return ""
 
 def write_csv(csvfile):
-    fieldnames = ['pagename', 'topic', 'creation_month', 'last_modified_month',
-                  'number_of_rows', 'payment', 'monthly_pageviews',
-                  'monthly_wikipedia_pageviews', 'principal_contributors_by_amount',
-                  'principal_contributors_alphabetical',
-                  'principal_contributors_by_amount_html']
-    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer = csv.DictWriter(csvfile, fieldnames=util.fieldnames)
     writer.writeheader()
     for pagename in sorted(pagename_generator(), key=dictionary_ordering):
         row_dict = {'pagename': pagename,

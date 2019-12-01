@@ -66,6 +66,7 @@ def print_table(reader):
 
 
 def print_summary_tables(reader):
+    # Create a sqlite db in memory; from https://stackoverflow.com/a/2888042/3422337
     cnx = sqlite3.connect(":memory:")
     cursor = cnx.cursor()
     cursor.execute("create table t (" + ", ".join(util.fieldnames) + ");")
@@ -78,9 +79,9 @@ def print_summary_tables(reader):
     query = cursor.execute("""
         select
             principal_contributors_alphabetical,
-            sum(monthly_pageviews),
-            sum(monthly_wikipedia_pageviews),
-            sum(number_of_rows)
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
         from t
         group by
             principal_contributors_alphabetical;""")
@@ -91,14 +92,63 @@ def print_summary_tables(reader):
     print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
     print('! data-sort-type="number" | Total number of rows')
     for row in query:
-        (principal_contributors, monthly_pageviews, monthly_wikipedia_pageviews,
-         number_of_rows) = row
+        (principal_contributors, sum_views, sum_wp_views, sum_row_num) = row
         print("|-")
         print('| ' + principal_contributors)
-        print('| style="text-align:right;" | ' + str(monthly_wikipedia_pageviews))
-        print('| style="text-align:right;" | ' + str(monthly_wikipedia_pageviews))
-        print('| style="text-align:right;" | ' + str(number_of_rows))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+    print("|}")
 
+
+    query = cursor.execute("""
+        select
+            topic,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            topic;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Topic')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    for row in query:
+        (topic, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| ' + topic)
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+    print("|}")
+
+
+    query = cursor.execute("""
+        select
+            case when cast(monthly_wikipedia_pageviews as decimal) > 0 then 'yes' else 'no' end as exists_on_wikipedia,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            exists_on_wikipedia;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Exists on Wikipedia?')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    for row in query:
+        (exists_on_wikipedia, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| ' + str(exists_on_wikipedia))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_row_num))
+    print("|}")
 
 
     cnx.commit()
@@ -106,9 +156,9 @@ def print_summary_tables(reader):
 
 
 if __name__ == "__main__":
-    with open('front_page_table_data.csv', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        print_table(reader)
+    # with open('front_page_table_data.csv', newline='') as csvfile:
+    #     reader = csv.DictReader(csvfile)
+    #     print_table(reader)
 
     # The main table can just use the CSV as given, but for the summary tables,
     # we want to import into sqlite so we can group things. So re-read the CSV

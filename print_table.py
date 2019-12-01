@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import csv
+import urllib.parse
 
 import util
 
@@ -40,11 +41,11 @@ def print_table(reader):
         # n = number_of_rows(pagename)
         print('| style="text-align:right;" | ' + row['number_of_rows'])
         # p = payment(pagename)
-        if row['payment'] > 0:
+        if float(row['payment']) > 0:
             print('| style="text-align:right;" | [{} {:.2f}]'.format(
                 "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
                         .format(urllib.parse.quote_plus(row['pagename'])),
-                row['payment']
+                float(row['payment'])
             ))
         else:
             print('| style="text-align:right;" | 0.00')

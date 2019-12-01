@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 import json
 import requests
+import sys
 import csv
 import datetime
 import dateutil.parser
@@ -304,7 +305,42 @@ def number_of_rows(pagename):
         # Could not find full timeline
         return ""
 
+def write_csv(csvfile):
+    fieldnames = ['pagename', 'topic', 'creation_month', 'last_modified_month',
+                  'number_of_rows', 'payment', 'monthly_pageviews',
+                  'monthly_wikipedia_pageviews', 'principal_contributors_by_amount',
+                  'principal_contributors_alphabetical',
+                  'principal_contributors_by_amount_html']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+    writer.writeheader()
+    for pagename in sorted(pagename_generator(), key=dictionary_ordering):
+        row_dict = {'pagename': pagename,
+                    'topic': topic(pagename),
+                    'creation_month': creation_month(pagename),
+                    'last_modified_month': last_modified_month(pagename),
+                    'number_of_rows': number_of_rows(pagename),
+                    'payment': payment(pagename),
+                    'monthly_pageviews': ga_pageviews(pagename),
+                    'monthly_wikipedia_pageviews': int(wp_pageviews(pagename))}
+        if pagename in PRINCIPAL_CONTRIBUTORS:
+            contributors = list(sorted(PRINCIPAL_CONTRIBUTORS[pagename],
+                                       key=lambda x: x[1],
+                                       reverse=True))
+            row_dict['principal_contributors_by_amount'] = ", ".join(
+                    worker for worker, _ in contributors)
+            row_dict['principal_contributors_by_amount_html'] = ", ".join(
+                    '<span title="%s">%s</span>' % ("$" + str(payment), worker)
+                    for worker, payment in contributors)
+            contributors = list(sorted(PRINCIPAL_CONTRIBUTORS[pagename],
+                                       key=lambda x: x[0]))
+            row_dict['principal_contributors_alphabetical'] = ", ".join(
+                    worker for worker, _ in contributors)
+        else:
+            row_dict['principal_contributors_by_amount'] = ""
+            row_dict['principal_contributors_alphabetical'] = ""
+            row_dict['principal_contributors_by_amount_html'] = ""
+        writer.writerow(row_dict)
 
 
 if __name__ == "__main__":
-    print_table()
+    write_csv(sys.stdout)

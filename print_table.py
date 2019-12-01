@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
+import pdb
+
 import csv
+import sqlite3
 import urllib.parse
 
 import util
@@ -62,7 +65,54 @@ def print_table(reader):
     print("|}")
 
 
+def print_summary_tables(reader):
+    cnx = sqlite3.connect(":memory:")
+    cursor = cnx.cursor()
+    cursor.execute("create table t (" + ", ".join(util.fieldnames) + ");")
+    rows = []
+    for row in reader:
+        rows.append(tuple(row[field] for field in util.fieldnames))
+    cursor.executemany("insert into t (" + ", ".join(util.fieldnames) + ") values (" + ",".join(["?"] * len(util.fieldnames)) + ");", rows)
+
+
+    query = cursor.execute("""
+        select
+            principal_contributors_alphabetical,
+            sum(monthly_pageviews),
+            sum(monthly_wikipedia_pageviews),
+            sum(number_of_rows)
+        from t
+        group by
+            principal_contributors_alphabetical;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Principal contributors')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    for row in query:
+        (principal_contributors, monthly_pageviews, monthly_wikipedia_pageviews,
+         number_of_rows) = row
+        print("|-")
+        print('| ' + principal_contributors)
+        print('| style="text-align:right;" | ' + str(monthly_wikipedia_pageviews))
+        print('| style="text-align:right;" | ' + str(monthly_wikipedia_pageviews))
+        print('| style="text-align:right;" | ' + str(number_of_rows))
+
+
+
+    cnx.commit()
+    cnx.close()
+
+
 if __name__ == "__main__":
     with open('front_page_table_data.csv', newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         print_table(reader)
+
+    # The main table can just use the CSV as given, but for the summary tables,
+    # we want to import into sqlite so we can group things. So re-read the CSV
+    # to import into a temporary database.
+    with open('front_page_table_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        print_summary_tables(reader)

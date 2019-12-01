@@ -27,7 +27,6 @@ def print_table(reader):
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
     print('! data-sort-type="number" | Principal contributors')
 
-    # for pagename in sorted(pagename_generator(), key=dictionary_ordering):
     for row in reader:
         print("|-")
         print("| [[" + row['pagename'] + "|" + util.page_display_name(row['pagename'])
@@ -38,9 +37,7 @@ def print_table(reader):
         else:
             print("| {{dts|" + row['creation_month'] + "}}")
         print("| {{dts|" + row['last_modified_month'] + "}}")
-        # n = number_of_rows(pagename)
         print('| style="text-align:right;" | ' + row['number_of_rows'])
-        # p = payment(pagename)
         if float(row['payment']) > 0:
             print('| style="text-align:right;" | [{} {:.2f}]'.format(
                 "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
@@ -50,7 +47,6 @@ def print_table(reader):
         else:
             print('| style="text-align:right;" | 0.00')
         print('| style="text-align:right;" | ' + row['monthly_pageviews'])
-        # wp_pv = int(wp_pageviews(pagename))
         if int(row['monthly_wikipedia_pageviews']) > 0:
             print('| style="text-align:right;" | [{} {}]'.format(
                 "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \

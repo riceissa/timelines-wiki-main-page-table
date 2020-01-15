@@ -12,7 +12,7 @@ def print_table(reader):
           "an automated script. The script does not check for manual changes\n"
           "to the table, so any changes you make will be overwritten the next\n"
           "time the script runs. The script automatically finds all pages on\n"
-          "the wiki starting with \"Timeline of\" so any timeline you write will\n"
+          "the wiki containing \"timeline of\" in the title so any timeline you write will\n"
           "automatically be included in the table the next time the script\n"
           "runs. For more information, see the script repository at\n"
           "https://github.com/riceissa/timelines-wiki-main-page-table")

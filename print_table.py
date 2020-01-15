@@ -29,37 +29,39 @@ def print_table(reader):
     print('! data-sort-type="text" | Principal contributors')
 
     for row in reader:
-        print("|-")
-        print("| [[" + row['pagename'] + "|" + util.page_display_name(row['pagename'])
-              + "]]")
-        print("| " + row['topic'] if row['topic'] else "|")
-        if not row['creation_month']:
-            print("| Not yet complete")
-        else:
-            print("| {{dts|" + row['creation_month'] + "}}")
-        print("| {{dts|" + row['last_modified_month'] + "}}")
-        print('| style="text-align:right;" | ' + row['number_of_rows'])
-        if float(row['payment']) > 0:
-            print('| style="text-align:right;" | [{} {:.2f}]'.format(
-                "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
-                        .format(urllib.parse.quote_plus(row['pagename'])),
-                float(row['payment'])
-            ))
-        else:
-            print('| style="text-align:right;" | 0.00')
-        print('| style="text-align:right;" | ' + row['monthly_pageviews'])
-        if int(row['monthly_wikipedia_pageviews']) > 0:
-            print('| style="text-align:right;" | [{} {}]'.format(
-                "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
-                        .format(urllib.parse.quote_plus(row['pagename'])),
-                row['monthly_wikipedia_pageviews']
+        number_of_rows = int(row['number_of_rows']) if row['number_of_rows'] else 0
+        if number_of_rows > 10 or float(row['payment']) > 0:
+            print("|-")
+            print("| [[" + row['pagename'] + "|" + util.page_display_name(row['pagename'])
+                  + "]]")
+            print("| " + row['topic'] if row['topic'] else "|")
+            if not row['creation_month']:
+                print("| Not yet complete")
+            else:
+                print("| {{dts|" + row['creation_month'] + "}}")
+            print("| {{dts|" + row['last_modified_month'] + "}}")
+            print('| style="text-align:right;" | ' + str(number_of_rows))
+            if float(row['payment']) > 0:
+                print('| style="text-align:right;" | [{} {:.2f}]'.format(
+                    "https://contractwork.vipulnaik.com/tasks.php?receptacle={}&matching=exact" \
+                            .format(urllib.parse.quote_plus(row['pagename'])),
+                    float(row['payment'])
                 ))
-        else:
-            print('| Not on Wikipedia')
-        try:
-            print('| ' + row['principal_contributors_by_amount_html'])
-        except KeyError:
-            print('|')
+            else:
+                print('| style="text-align:right;" | 0.00')
+            print('| style="text-align:right;" | ' + row['monthly_pageviews'])
+            if int(row['monthly_wikipedia_pageviews']) > 0:
+                print('| style="text-align:right;" | [{} {}]'.format(
+                    "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
+                            .format(urllib.parse.quote_plus(row['pagename'])),
+                    row['monthly_wikipedia_pageviews']
+                    ))
+            else:
+                print('| Not on Wikipedia')
+            try:
+                print('| ' + row['principal_contributors_by_amount_html'])
+            except KeyError:
+                print('|')
     print("|}")
 
 

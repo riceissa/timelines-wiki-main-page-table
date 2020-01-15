@@ -109,14 +109,9 @@ def ga_pageviews(pagename):
 
 
 def dictionary_ordering(x):
-    """Sorting key as a string would be ordered in an English dictionary."""
-    # Strip out the "the" from the beginning of page names
-    for prefix in ["timeline of the ", "timeline of "]:
-        if x.lower().startswith(prefix):
-            x = x[len(prefix):]
-            break
-
-    return "".join(char for char in x.lower() if char.isalpha())
+    """Sorting key for timeline titles as a string would be ordered in an
+    English dictionary."""
+    return "".join(char for char in util.page_display_name(x).lower() if char.isalpha())
 
 
 def payment(pagename):

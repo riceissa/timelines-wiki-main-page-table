@@ -3,6 +3,8 @@
 import csv
 import sqlite3
 import urllib.parse
+import dateutil.parser
+import datetime
 
 import util
 
@@ -77,6 +79,7 @@ def print_summary_tables(reader):
     cursor.executemany("insert into t (" + ", ".join(util.fieldnames) + ") values (" + ",".join(["?"] * len(util.fieldnames)) + ");", rows)
 
 
+    # Group by principal contributors
     query = cursor.execute("""
         select
             principal_contributors_alphabetical,
@@ -111,6 +114,7 @@ def print_summary_tables(reader):
     print("|}")
 
 
+    # Group by topic
     query = cursor.execute("""
         select
             topic,
@@ -139,6 +143,7 @@ def print_summary_tables(reader):
     print("|}")
 
 
+    # Group by whether a page exists on Wikipedia
     query = cursor.execute("""
         select
             case when cast(monthly_wikipedia_pageviews as decimal) > 0 then 'yes' else 'no' end as exists_on_wikipedia,
@@ -167,8 +172,135 @@ def print_summary_tables(reader):
     print("|}")
 
 
+    # Group by creation month
+    query = cursor.execute("""
+        select
+            creation_month,
+            count(*) as num_timelines,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            creation_month;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Creation month')
+    print('! data-sort-type="number" | Number of timelines')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    rows = sorted([row for row in query], key=lambda x: month_order(x[0]))
+    for row in rows:
+        (creation_month, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| {{dts|' + str(creation_month) + '}}')
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
+    print("|}")
+
+
+    # Group by last modification month
+    query = cursor.execute("""
+        select
+            last_modified_month,
+            count(*) as num_timelines,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            last_modified_month;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Last modification month')
+    print('! data-sort-type="number" | Number of timelines')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    rows = sorted([row for row in query], key=lambda x: month_order(x[0]))
+    for row in rows:
+        (last_modified_month, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| {{dts|' + str(last_modified_month) + '}}')
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
+    print("|}")
+
+
+    # Group by creation year
+    query = cursor.execute("""
+        select
+            substr(creation_month, -4) as creation_year,
+            count(*) as num_timelines,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            creation_year;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Creation year')
+    print('! data-sort-type="number" | Number of timelines')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    for row in query:
+        (creation_year, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| ' + str(creation_year))
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
+    print("|}")
+
+
+    # Group by last modification year
+    query = cursor.execute("""
+        select
+            substr(last_modified_month, -4) as last_modified_year,
+            count(*) as num_timelines,
+            sum(monthly_pageviews) as sum_views,
+            sum(monthly_wikipedia_pageviews) as sum_wp_views,
+            sum(number_of_rows) as sum_row_num
+        from t
+        group by
+            last_modified_year;""")
+    print('{| class="sortable wikitable"')
+    print("|-")
+    print('! Last modification year')
+    print('! data-sort-type="number" | Number of timelines')
+    print('! data-sort-type="number" | Total monthly pageviews')
+    print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
+    print('! data-sort-type="number" | Total number of rows')
+    for row in query:
+        (last_modified_year, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
+        print("|-")
+        print('| ' + str(last_modified_year))
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
+        print('| style="text-align:right;" | {:,}'.format(sum_views))
+        print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
+        print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
+    print("|}")
+
+
     conn.commit()
     conn.close()
+
+
+def month_order(month_string):
+    try:
+        return dateutil.parser.parse(month_string)
+    except ValueError:
+        # Return a date older than any of our timeline creation dates, so that
+        # the blank row appears on top
+        return datetime.datetime(2000, 1, 1)
 
 
 if __name__ == "__main__":

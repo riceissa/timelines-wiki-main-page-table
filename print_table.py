@@ -78,6 +78,7 @@ def print_summary_tables(reader):
     query = cursor.execute("""
         select
             principal_contributors_alphabetical,
+            count(*) as num_timelines,
             sum(monthly_pageviews) as sum_views,
             sum(monthly_wikipedia_pageviews) as sum_wp_views,
             sum(number_of_rows) as sum_row_num
@@ -87,13 +88,15 @@ def print_summary_tables(reader):
     print('{| class="sortable wikitable"')
     print("|-")
     print('! Principal contributors')
+    print('! data-sort-type="number" | Number of timelines')
     print('! data-sort-type="number" | Total monthly pageviews')
     print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
     print('! data-sort-type="number" | Total number of rows')
     for row in query:
-        (principal_contributors, sum_views, sum_wp_views, sum_row_num) = row
+        (principal_contributors, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
         print("|-")
         print('| ' + principal_contributors)
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
         # For some reason, the row number total changes from an integer to a
@@ -109,6 +112,7 @@ def print_summary_tables(reader):
     query = cursor.execute("""
         select
             topic,
+            count(*) as num_timelines,
             sum(monthly_pageviews) as sum_views,
             sum(monthly_wikipedia_pageviews) as sum_wp_views,
             sum(number_of_rows) as sum_row_num
@@ -118,13 +122,15 @@ def print_summary_tables(reader):
     print('{| class="sortable wikitable"')
     print("|-")
     print('! Topic')
+    print('! data-sort-type="number" | Number of timelines')
     print('! data-sort-type="number" | Total monthly pageviews')
     print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
     print('! data-sort-type="number" | Total number of rows')
     for row in query:
-        (topic, sum_views, sum_wp_views, sum_row_num) = row
+        (topic, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
         print("|-")
         print('| ' + topic)
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
         print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))
@@ -134,6 +140,7 @@ def print_summary_tables(reader):
     query = cursor.execute("""
         select
             case when cast(monthly_wikipedia_pageviews as decimal) > 0 then 'yes' else 'no' end as exists_on_wikipedia,
+            count(*) as num_timelines,
             sum(monthly_pageviews) as sum_views,
             sum(monthly_wikipedia_pageviews) as sum_wp_views,
             sum(number_of_rows) as sum_row_num
@@ -143,13 +150,15 @@ def print_summary_tables(reader):
     print('{| class="sortable wikitable"')
     print("|-")
     print('! Exists on Wikipedia?')
+    print('! data-sort-type="number" | Number of timelines')
     print('! data-sort-type="number" | Total monthly pageviews')
     print('! data-sort-type="number" | Total monthly pageviews on Wikipedia')
     print('! data-sort-type="number" | Total number of rows')
     for row in query:
-        (exists_on_wikipedia, sum_views, sum_wp_views, sum_row_num) = row
+        (exists_on_wikipedia, num_timelines, sum_views, sum_wp_views, sum_row_num) = row
         print("|-")
         print('| ' + str(exists_on_wikipedia))
+        print('| style="text-align:right;" | {:,}'.format(num_timelines))
         print('| style="text-align:right;" | {:,}'.format(sum_views))
         print('| style="text-align:right;" | {:,}'.format(sum_wp_views))
         print('| style="text-align:right;" | {:,}'.format(int(sum_row_num)))

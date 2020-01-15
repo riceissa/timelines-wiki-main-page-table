@@ -176,13 +176,13 @@ def query(request, sleep=1):
 def pagename_generator():
     payload = {
             "list": "allpages",
-            "apprefix": "Timeline of",
             "apfilterredir": "nonredirects",
             "aplimit": 50,
             }
     for result in query(payload):
         for page in result["allpages"]:
-            yield page["title"]
+            if "timeline of " in page["title"].lower():
+                yield page["title"]
 
 
 def wp_pageviews(pagename):

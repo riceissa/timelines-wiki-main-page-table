@@ -26,7 +26,7 @@ def print_table(reader):
     print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
-    print('! data-sort-type="number" | Principal contributors')
+    print('! data-sort-type="text" | Principal contributors')
 
     for row in reader:
         print("|-")

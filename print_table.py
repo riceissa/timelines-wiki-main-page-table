@@ -8,7 +8,11 @@ import datetime
 
 import util
 
-def print_table(reader):
+def print_table(reader, previous_month_reader):
+    previous_month_data = {}
+    for row in previous_month_reader:
+        previous_month_data[row['pagename']] = row['monthly_pageviews']
+
     print("<!-- WARNING:")
     print("Do not manually edit this table. This table is produced using\n"
           "an automated script. The script does not check for manual changes\n"
@@ -27,6 +31,7 @@ def print_table(reader):
     print('! data-sort-type="number" | Number of rows')
     print('! data-sort-type="number" | Total payment')
     print('! data-sort-type="number" | Monthly pageviews')
+    print('! data-sort-type="number" | Percentage change in monthly pageviews')
     print('! data-sort-type="number" | Monthly pageviews on Wikipedia')
     print('! data-sort-type="text" | Principal contributors')
 
@@ -52,6 +57,18 @@ def print_table(reader):
             else:
                 print('| style="text-align:right;" | 0.00')
             print('| style="text-align:right;" | ' + row['monthly_pageviews'])
+            curr_month_pageviews = int(row['monthly_pageviews'])
+            prev_month_pageviews = int(previous_month_data[row['pagename']])
+            if prev_month_pageviews > 0:
+                percentage_change = (curr_month_pageviews - prev_month_pageviews) / prev_month_pageviews * 100
+            elif curr_month_pageviews > 0:
+                percentage_change = 1000.0
+            else:
+                percentage_change = 0.0
+            if percentage_change > 0:
+                print('| style="text-align:right;" | +{:.0f}%'.format(percentage_change))
+            else:
+                print('| style="text-align:right;" | {:.0f}%'.format(percentage_change))
             if int(row['monthly_wikipedia_pageviews']) > 0:
                 print('| style="text-align:right;" | [{} {}]'.format(
                     "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \
@@ -304,9 +321,10 @@ def month_order(month_string):
 
 
 if __name__ == "__main__":
-    with open('front_page_table_data.csv', newline='') as csvfile:
+    with open('front_page_table_data.csv', newline='') as csvfile, open('previous_month_front_page_table_data.csv', newline='') as previous_month_csvfile:
         reader = csv.DictReader(csvfile)
-        print_table(reader)
+        previous_month_reader = csv.DictReader(previous_month_csvfile)
+        print_table(reader, previous_month_reader)
 
     # The main table can just use the CSV as given, but for the summary tables,
     # we want to import into sqlite so we can group things. So re-read the CSV

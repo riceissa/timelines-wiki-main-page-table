@@ -58,7 +58,7 @@ def print_table(reader, previous_month_reader):
                 print('| style="text-align:right;" | 0.00')
             print('| style="text-align:right;" | ' + row['monthly_pageviews'])
             curr_month_pageviews = int(row['monthly_pageviews'])
-            prev_month_pageviews = int(previous_month_data[row['pagename']])
+            prev_month_pageviews = int(previous_month_data.get(row['pagename'], 0))
             if prev_month_pageviews > 0:
                 percentage_change = (curr_month_pageviews - prev_month_pageviews) / prev_month_pageviews * 100
             elif curr_month_pageviews > 0:

@@ -17,6 +17,16 @@ import util
 logging.basicConfig(level=logging.INFO)
 
 
+try:
+    with open("EMAIL.txt", "r") as f:
+        EMAIL = next(f).strip()
+except FileNotFoundError:
+    print("Please create a file called EMAIL.txt containing your email on the first line.\n"
+          "This is for querying the WikiMedia pageviews API. See\n"
+          "https://meta.wikimedia.org/wiki/User-Agent_policy for more\n"
+          "information about this requirement.")
+    sys.exit()
+
 # By checking the contractwork database, we can tell most of the time whether a
 # timeline is complete or not by looking at the total payment (if it's zero,
 # it's incomplete; otherwise it's complete). The exceptions are timelines that
@@ -224,7 +234,7 @@ def wp_pageviews(pagename):
 
     logging.info("Querying Wikipedia pageviews for %s", pagename)
     headers = {
-        "User-Agent": "TimelinesWikiMainPageTableUpdateScript/1.0 (https://github.com/riceissa/timelines-wiki-main-page-table/; riceissa@gmail.com) " + "python-requests/" + requests.__version__ + " bot",
+        "User-Agent": "TimelinesWikiMainPageTableUpdateScript/1.0 (https://github.com/riceissa/timelines-wiki-main-page-table/; {}) python-requests/{} bot".format(EMAIL, requests.__version__),
     }
     r = requests.get(url, headers=headers)
     result = r.json()

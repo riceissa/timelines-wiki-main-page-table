@@ -18,6 +18,9 @@ Steps:
   ```
 
 - `make table.mediawiki`: Re-run `proc.py`. The Wikipedia pageviews fetching is included in this.
+  **Important**: If this step crashes, you should re-run `proc.py` manually
+  instead of running `make`. Otherwise the previous month's pageviews data will
+  be overwritten by the blank new data file!
 
 - (manual) update https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with
   the contents of `table.mediawiki`

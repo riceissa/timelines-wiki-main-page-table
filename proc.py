@@ -223,7 +223,10 @@ def wp_pageviews(pagename):
           "/monthly/" + start + "/" + end
 
     logging.info("Querying Wikipedia pageviews for %s", pagename)
-    r = requests.get(url)
+    headers = {
+        "User-Agent": "TimelinesWikiMainPageTableUpdateScript/1.0 (https://github.com/riceissa/timelines-wiki-main-page-table/; riceissa@gmail.com) " + "python-requests/" + requests.__version__ + " bot",
+    }
+    r = requests.get(url, headers=headers)
     result = r.json()
     views = 0
     if 'items' not in result:

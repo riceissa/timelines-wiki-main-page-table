@@ -236,7 +236,23 @@ def wp_pageviews(pagename):
     headers = {
         "User-Agent": "TimelinesWikiMainPageTableUpdateScript/1.0 (https://github.com/riceissa/timelines-wiki-main-page-table/; {}) python-requests/{} bot".format(EMAIL, requests.__version__),
     }
-    r = requests.get(url, headers=headers)
+    try:
+        r = requests.get(url, headers=headers)
+    except:
+        time.sleep(2)
+        logging.info("Query for Wikipedia pageviews failed; sleeping for 2 seconds and then retrying")
+        try:
+            r = requests.get(url, headers=headers)
+        except:
+            time.sleep(4)
+            logging.info("Query for Wikipedia pageviews failed; sleeping for 4 seconds and then retrying")
+            try:
+                r = requests.get(url, headers=headers)
+            except:
+                time.sleep(8)
+                logging.info("Query for Wikipedia pageviews failed; sleeping for 8 seconds and then retrying (this will be the final try)")
+                r = requests.get(url, headers=headers)
+
     result = r.json()
     views = 0
     if 'items' not in result:

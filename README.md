@@ -29,6 +29,8 @@ Steps:
 
 - (manual) update the last generated date on https://timelines.issarice.com/wiki/Main_Page
 
+- (manual) message Vipul saying I have updated the front page
+
 - (manual) in org mode, update the scheduled timestamp to be the first day of the next month.
 
 ## See also

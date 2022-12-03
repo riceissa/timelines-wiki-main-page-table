@@ -24,12 +24,24 @@ Steps:
   instead of running `make`. Otherwise the previous month's pageviews data will
   be overwritten by the blank new data file!
 
+- (manual) Make sure `table.mediawiki` file does not exist on my Desktop.
+
+- Run
+  
+  ```
+  cp table.mediawiki /mnt/c/Users/Issa/Desktop/
+  ```
+  
+  to copy the newly-generated `table.mediawiki` file out of WSL and into Windows's Desktop.
+
 - (manual) update https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with
   the contents of `table.mediawiki`
 
 - (manual) update the last generated date on https://timelines.issarice.com/wiki/Main_Page
 
 - (manual) message Vipul saying I have updated the front page
+
+- (manual) Delete the file `table.mediawiki` from the Windows Desktop.
 
 - (manual) in org mode, update the scheduled timestamp to be the first day of the next month.
 

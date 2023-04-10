@@ -13,7 +13,9 @@ def print_table(reader, previous_month_reader):
     for row in previous_month_reader:
         previous_month_data[row['pagename']] = row['monthly_pageviews']
 
-    print("<!-- WARNING:")
+    print("<!-- ")
+    print("Script last ran on:", datetime.date.today().strftime("%Y-%m-%d"))
+    print("WARNING:")
     print("Do not manually edit this table. This table is produced using\n"
           "an automated script. The script does not check for manual changes\n"
           "to the table, so any changes you make will be overwritten the next\n"

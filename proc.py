@@ -114,7 +114,7 @@ def ga_pageviews(pagename):
     """
     Get Google Analytics pageviews for the last 30 days.
     """
-    start_date, end_date = pageviews_date_range(pagename)
+    start_date, end_date = pageviews_date_range(pagename, destination="ga4")
     path = "/wiki/" + pagename.replace(" ", "_")
     return int(GA_PAGEVIEWS.get(path, 0) / (end_date - start_date).days * 30)
 
@@ -196,7 +196,13 @@ def pagename_generator():
                 yield page["title"]
 
 
-def pageviews_date_range(pagename):
+def pageviews_date_range(pagename, destination=None):
+    """
+    Give the valid range of dates for which pageviews can be obtained for the
+    given pagename.  The parameter destination specifies what the date range
+    will be used for, which is useful in particular for Google Analytics GA4 as
+    GA4 does not have pageviews from before April 2023.
+    """
     # creation_month is used to find out what months to get the pageviews data
     # for
     cm = creation_month(pagename)
@@ -216,6 +222,10 @@ def pageviews_date_range(pagename):
         start_date = datetime.date(cd.year, cd.month + 1, 1)
     max_back = datetime.date(today.year - 1, today.month, 1)
     start_date = max(start_date, max_back)
+    if destination == "ga4":
+        # GA4 does not have pageviews data from before April 2023, so force it
+        # to return a start date that is later than the start of May 2023.
+        start_date = max(start_date, datetime.date(2023, 5, 1))
 
     # Stop getting pageviews at the last day of the previous month
     end_date = datetime.date(today.year, today.month, 1) - \

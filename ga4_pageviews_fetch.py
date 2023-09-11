@@ -32,10 +32,14 @@ def quote(x):
 def main():
     client = BetaAnalyticsDataClient.from_service_account_json(KEY_FILE_LOCATION)
     today = datetime.date.today()
-    start_date = datetime.date(today.year - 1, today.month, 1)
-    # Stop getting pageviews at the last day of the previous month
-    end_date = datetime.date(today.year, today.month, 1) - \
-            datetime.timedelta(days=1)
+
+    # It is important to use proc.creation_month in this script here, because
+    # even though the GA API will just get the pageviews for the entire valid
+    # period (thus it's no problem to specify a start date that is too early),
+    # some pages may nevertheless get pageviews from before they were fully
+    # created, and we don't want to count those pageviews.
+    start_date, end_date = pageviews_date_range(pagename, destination="ga4")
+
     pageviews = pageviews_for_project(client, "364967470",
             start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
     print("page_path,pageviews")

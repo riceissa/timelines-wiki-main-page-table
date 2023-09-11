@@ -54,7 +54,10 @@ def print_table(reader):
                 ))
             else:
                 print('| style="text-align:right;" | 0.00')
-            print('| style="text-align:right;" | ' + row['monthly_pageviews'])
+            if int(row['monthly_pageviews']) > 0:
+                print('| style="text-align:right;" | ' + row['monthly_pageviews'])
+            else:
+                print('| Not yet complete')
             if int(row['monthly_wikipedia_pageviews']) > 0:
                 print('| style="text-align:right;" | [{} {}]'.format(
                     "https://wikipediaviews.org/displayviewsformultiplemonths.php?page={}&allmonths=allmonths&language=en&drilldown=human" \

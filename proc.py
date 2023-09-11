@@ -14,6 +14,8 @@ import time
 
 import util
 
+import pdb
+
 logging.basicConfig(level=logging.INFO)
 
 
@@ -115,8 +117,10 @@ def ga_pageviews(pagename):
     Get Google Analytics pageviews for the last 30 days.
     """
     start_date, end_date = pageviews_date_range(pagename, destination="ga4")
+    if not start_date or not end_date:
+        return 0
     path = "/wiki/" + pagename.replace(" ", "_")
-    return int(GA_PAGEVIEWS.get(path, 0) / (end_date - start_date).days * 30)
+    return int(GA_PAGEVIEWS.get(path, 0)) / (end_date - start_date).days * 30
 
 
 def dictionary_ordering(x):
@@ -239,7 +243,7 @@ def wp_pageviews(pagename):
     Get monthly Wikipedia pageviews data for pagename.
     """
     start_date, end_date = pageviews_date_range(pagename)
-    if not start or not end:
+    if not start_date or not end_date:
         return 0
     # m = str(start_date.month) if start_date.month >= 10 else "0" + \
     #         str(start_date.month)
@@ -354,7 +358,7 @@ def write_csv(csvfile):
                     'last_modified_month': last_modified_month(pagename),
                     'number_of_rows': number_of_rows(pagename),
                     'payment': payment(pagename),
-                    'monthly_pageviews': ga_pageviews(pagename),
+                    'monthly_pageviews': int(ga_pageviews(pagename)),
                     'monthly_wikipedia_pageviews': int(wp_pageviews(pagename))}
         if pagename in PRINCIPAL_CONTRIBUTORS:
             contributors = list(sorted(PRINCIPAL_CONTRIBUTORS[pagename],

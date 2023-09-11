@@ -195,17 +195,14 @@ def pagename_generator():
                 yield page["title"]
 
 
-def wp_pageviews(pagename):
-    """
-    Get monthly Wikipedia pageviews data for pagename.
-    """
+def pageviews_date_range(pagename):
     # creation_month is used to find out what months to get the pageviews data
     # for
     cm = creation_month(pagename)
     # If the page isn't done, it won't be on Wikipedia so don't bother getting
     # pageviews
     if not cm:
-        return 0
+        return (None, None)
     today = datetime.date.today()
 
     # Start getting pageviews data from the month following the creation of the
@@ -218,14 +215,26 @@ def wp_pageviews(pagename):
         start_date = datetime.date(cd.year, cd.month + 1, 1)
     max_back = datetime.date(today.year - 1, today.month, 1)
     start_date = max(start_date, max_back)
-    m = str(start_date.month) if start_date.month >= 10 else "0" + \
-            str(start_date.month)
-    start = str(start_date.year) + m + "01"
 
     # Stop getting pageviews at the last day of the previous month
-    last_day_of_last_month = datetime.date(today.year, today.month, 1) - \
+    end_date = datetime.date(today.year, today.month, 1) - \
             datetime.timedelta(days=1)
-    end = datetime.datetime.strftime(last_day_of_last_month, "%Y%m%d")
+
+    return (start_date, end_date)
+
+
+def wp_pageviews(pagename):
+    """
+    Get monthly Wikipedia pageviews data for pagename.
+    """
+    start_date, end_date = pageviews_date_range(pagename)
+    if not start or not end:
+        return 0
+    # m = str(start_date.month) if start_date.month >= 10 else "0" + \
+    #         str(start_date.month)
+    # start = str(start_date.year) + m + "01"
+    start = datetime.datetime.strftime(start_date, "%Y%m%d")
+    end = datetime.datetime.strftime(end_date, "%Y%m%d")
 
     url = "https://wikimedia.org/api/rest_v1/metrics/pageviews/" + \
           "per-article/en.wikipedia.org/all-access/user/" + \
@@ -259,7 +268,7 @@ def wp_pageviews(pagename):
         return 0
     for month in result['items']:
         views += int(month['views'])
-    return views / (last_day_of_last_month - start_date).days * 30
+    return views / (end_date - start_date).days * 30
 
 
 def full_timeline_heading(soup):

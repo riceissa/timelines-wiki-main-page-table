@@ -5,10 +5,6 @@ import sys
 # import mysql.connector
 import time
 
-from proc import creation_month
-
-# import login
-
 from google.analytics.data_v1beta import BetaAnalyticsDataClient
 from google.analytics.data_v1beta.types import (
     DateRange,
@@ -31,14 +27,25 @@ def quote(x):
 
 def main():
     client = BetaAnalyticsDataClient.from_service_account_json(KEY_FILE_LOCATION)
-    today = datetime.date.today()
 
-    # It is important to use proc.creation_month in this script here, because
-    # even though the GA API will just get the pageviews for the entire valid
-    # period (thus it's no problem to specify a start date that is too early),
-    # some pages may nevertheless get pageviews from before they were fully
-    # created, and we don't want to count those pageviews.
-    start_date, end_date = pageviews_date_range(pagename, destination="ga4")
+    # It would be ideal to use proc.pageviews_date_range in this script here,
+    # because even though the GA API will just get the pageviews for the entire
+    # valid period (thus it's no problem to specify a start date that is too
+    # early), some pages may nevertheless get a few pageviews from before they
+    # were fully created, and we ideally wouldn't want to count those
+    # pageviews. However, using proc.pageviews_date_range to get the exact
+    # valid range for each page's URL will require an API call for each URL and
+    # I haven't done the math to see if GA API's usage limits allow this.  But
+    # in any case, a page shouldn't be getting too many pageviews before it's
+    # been marked as created (since logged in views don't count), so doing
+    # things the easy way should not overestimate pageviews by very much (and
+    # if a page is more than a year old, will yield identical results).
+    today = datetime.date.today()
+    start_date = max(datetime.date(today.year - 1, today.month, 1),
+                     datetime.date(2023, 5, 1))
+    # Stop getting pageviews at the last day of the previous month
+    end_date = datetime.date(today.year, today.month, 1) - \
+            datetime.timedelta(days=1)
 
     pageviews = pageviews_for_project(client, "364967470",
             start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))

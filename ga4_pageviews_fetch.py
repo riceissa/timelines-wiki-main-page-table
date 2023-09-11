@@ -23,11 +23,25 @@ KEY_FILE_LOCATION = "timelines-key.json"
 
 LIMIT = 10000
 
+def quote(x):
+    """CSV-quote x."""
+    x = x.replace('"', '""')
+    return '"' + x + '"'
+
 
 def main():
     client = BetaAnalyticsDataClient.from_service_account_json(KEY_FILE_LOCATION)
-    pageviews = pageviews_for_project(client, "364967470", "2022-09-10", "2023-09-10")
-    print(pageviews)
+    today = datetime.date.today()
+    start_date = datetime.date(today.year - 1, today.month, 1)
+    # Stop getting pageviews at the last day of the previous month
+    end_date = datetime.date(today.year, today.month, 1) - \
+            datetime.timedelta(days=1)
+    pageviews = pageviews_for_project(client, "364967470",
+            start_date.strftime("%Y-%m-%d"), end_date.strftime("%Y-%m-%d"))
+    print("page_path,pageviews")
+    for row in pageviews:
+        path, views = row
+        print(f"{quote(path)},{views}")
 
 
 def get_report(client, property_id, start_date, end_date, offset=0):

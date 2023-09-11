@@ -7,7 +7,7 @@ table.mediawiki:
 	./print_table.py > "$@"
 
 ga.csv:
-	./HelloAnalytics.py > $@
+	./ga4_pageviews_fetch.py > $@
 
 .PHONY: clean
 clean:

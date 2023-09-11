@@ -114,8 +114,9 @@ def ga_pageviews(pagename):
     """
     Get Google Analytics pageviews for the last 30 days.
     """
+    start_date, end_date = pageviews_date_range(pagename)
     path = "/wiki/" + pagename.replace(" ", "_")
-    return int(GA_PAGEVIEWS.get(path, 0))
+    return int(GA_PAGEVIEWS.get(path, 0) / (end_date - start_date).days * 30)
 
 
 def dictionary_ordering(x):

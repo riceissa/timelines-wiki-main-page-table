@@ -13,7 +13,11 @@ Steps:
   ```bash
   # from the contractwork directory
   git up
+  mysql contractwork -e "drop table if exists workers"
+  mysql contractwork -e "drop table if exists payers"
   mysql contractwork -e "drop table if exists tasks"
+  mysql contractwork < sql/workers.sql
+  mysql contractwork < sql/payers.sql
   mysql contractwork < sql/tasks.sql
   ```
 

@@ -22,21 +22,27 @@ cd "$thisdir"
 # Re-run `proc.py`. The Wikipedia pageviews fetching is included in this.
 make table.mediawiki
 
-explorer.exe .
+# Normally doing `explorer.exe .` does not require the &, but for some reason
+# within a script, not having the & will just end the script right here.
+# Possibly because we set -e above.
+explorer.exe . &
 
-echo "Open the file table.mediawiki using a text editor."
+# Turn off command echoing because the rest are just echo commands
+set +x
+
+echo -e "\n\nOpen the file table.mediawiki using a text editor."
 read -p "Press enter to continue"
 
-echo "Update https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with the contents of table.mediawiki"
+echo -e "\n\nUpdate https://timelines.issarice.com/wiki/User:Issa/Main_page_automated with the contents of table.mediawiki" | fold -w 70 -s
 read -p "Press enter to continue"
 
-echo "Update the last generated date on https://timelines.issarice.com/wiki/Main_Page"
+echo -e "\n\nUpdate the last generated date on https://timelines.issarice.com/wiki/Main_Page" | fold -w 70 -s
 read -p "Press enter to continue"
 
-echo "Message Vipul saying I have updated the front page"
+echo -e "\n\nMessage Vipul saying I have updated the front page" | fold -w 70 -s
 read -p "Press enter to continue"
 
-echo "In org mode, update the scheduled timestamp to be the first day of the next month."
+echo -e "\n\nIn org mode, update the scheduled timestamp to be the first day of the next month." | fold -w 70 -s
 read -p "Press enter to continue"
 
-echo "Done!"
+echo -e "\n\nDone!"

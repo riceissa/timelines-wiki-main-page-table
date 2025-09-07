@@ -11,12 +11,13 @@ import logging
 import urllib
 import mysql.connector
 import time
+from pathlib import Path
 
 import util
 
-import pdb
-
 logging.basicConfig(level=logging.INFO)
+
+TW_COOKIES = {'humancheck': 'is_human'}
 
 
 try:
@@ -85,7 +86,11 @@ ARTICLES = {
         }
 
 
-cnx = mysql.connector.connect(user='issa', database='contractwork')
+if Path("/etc/fedora-release").exists():
+    cnx = mysql.connector.connect(user='issa', database='contractwork',
+                                  unix_socket='/var/lib/mysql/mysql.sock')
+else:
+    cnx = mysql.connector.connect(user='issa', database='contractwork')
 cursor = cnx.cursor()
 cursor.execute("""select task_receptacle,sum(payment),min(topic),min(completion_date)
                from tasks group by task_receptacle""")
@@ -172,7 +177,8 @@ def query(request, sleep=1):
         # last result.
         req.update(lastContinue)
         # Call API
-        r = requests.get("https://timelines.issarice.com/api.php", params=req)
+        r = requests.get("https://timelines.issarice.com/api.php",
+                         params=req, cookies=TW_COOKIES)
         result = r.json()
         logging.info("QUERY: ON ITERATION %s, SLEEPING FOR %s", iteration, sleep)
         time.sleep(sleep)
@@ -322,7 +328,8 @@ def last_modified_month(pagename):
             "format": "json",
             }
     logging.info("Querying last modified month for %s", pagename)
-    r = requests.get("https://timelines.issarice.com/api.php", params=payload)
+    r = requests.get("https://timelines.issarice.com/api.php",
+                     params=payload, cookies=TW_COOKIES)
     result = r.json()
     return dateutil.parser.parse(list(result['query']['pages'].values())[0]['revisions'][0]['timestamp']).strftime("%B %Y")
 
@@ -335,7 +342,8 @@ def number_of_rows(pagename):
     }
 
     logging.info("Querying number of rows for %s", pagename)
-    r = requests.get("https://timelines.issarice.com/api.php", params=payload)
+    r = requests.get("https://timelines.issarice.com/api.php",
+                     params=payload, cookies=TW_COOKIES)
     result = r.json()
     text = result["parse"]["text"]["*"]
     soup = BeautifulSoup(text, "lxml")

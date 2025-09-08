@@ -305,6 +305,8 @@ def full_timeline_table(soup, h2):
     Find and return the "Full timeline" table tag given the tag soup and the h2
     "Full timeline" heading tag.
     """
+    if not h2:
+        return None
     tag = h2.parent
     while tag and (tag.name != "table" or
             "not-full-timeline" in tag.get("class")):

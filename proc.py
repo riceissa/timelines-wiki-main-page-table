@@ -295,8 +295,8 @@ def wp_pageviews(pagename):
 def full_timeline_heading(soup):
     """Find and return the "Full timeline" heading."""
     for h2 in soup.find_all("h2"):
-        span = h2.find("span", {"class": "mw-headline"})
-        if span and (span.text == "Full timeline" or span.text == "Timeline"):
+        heading_text = h2.text.strip()
+        if heading_text == "Full timeline" or heading_text == "Timeline":
             return h2
 
 
@@ -305,7 +305,7 @@ def full_timeline_table(soup, h2):
     Find and return the "Full timeline" table tag given the tag soup and the h2
     "Full timeline" heading tag.
     """
-    tag = h2
+    tag = h2.parent
     while tag and (tag.name != "table" or
             "not-full-timeline" in tag.get("class")):
         tag = tag.next_sibling
